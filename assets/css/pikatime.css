@@ -1,0 +1,35 @@
+.pikatime-container {
+   width: 250px;
+   position: absolute;
+   top: 50%;
+   left: 100%;
+   transform: translateY(-50%);
+   transform-origin: 50% 50%;
+   z-index: 100;
+}
+.pikatime-container::before {
+   content: "";
+   position: absolute;
+   right: 100%;
+   top: calc(50% - 20px);
+
+   border: solid 20px transparent;
+   border-right-color: black;
+}
+
+.pikatime-container canvas {
+   display: block;
+}
+
+.pikatime-container button {
+   border: none;
+   background-color: black;
+   color: white;
+   padding: 1em;
+   width: 50%;
+}
+
+.pikatime-container button:hover {
+   background-color: #8dae28;
+   cursor: pointer;
+}
