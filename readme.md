@@ -43,3 +43,9 @@ fields:
 ### In templates
 
 The pikatime field only saves time in basic 24-hour format. You can use the PHP date/time functions to format them as desired. See [strtotime](http://php.net/manual/en/function.strtotime.php) and [Date/Time Functions](http://php.net/manual/en/ref.datetime.php) on the PHP website.
+
+## Development
+These are really just notes for me
+
+Dev:
+webpack pikatime.js --output-filename build.js -w
