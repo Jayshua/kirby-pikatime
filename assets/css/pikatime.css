@@ -32,7 +32,7 @@
 .pikatime-container button {
    border: none;
    color: white;
-   padding: 1em;
+   padding: .6em .6em .75em;
    width: 50%;
    background-color: black;
 }
