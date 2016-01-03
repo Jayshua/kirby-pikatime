@@ -48,7 +48,7 @@ The `mode` property chooses whether the picker should display in 12 hour or 24 h
 The pikatime field only saves time in basic 24-hour format. You can use the PHP date/time functions to format them as desired. See [strtotime](http://php.net/manual/en/function.strtotime.php) and [Date/Time Functions](http://php.net/manual/en/ref.datetime.php) on the PHP website.
 
 ## Development
-These are really just notes for me
+This is really just a note for me
 
-Dev:
-webpack pikatime.js --output-filename build.js -w
+To build (in assets/js):
+`webpack pikatime.js --output-filename build.js -w`
