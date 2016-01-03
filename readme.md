@@ -38,7 +38,10 @@ fields:
     time:
         label: Event Time
         type:  pikatime
+        mode:  12
 ```
+
+The `mode` property chooses whether the picker should display in 12 hour or 24 hour mode.
 
 ### In templates
 
