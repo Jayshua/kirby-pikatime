@@ -77,7 +77,7 @@
 	   canvas.width  = 250;
 
 	   // Initialize the clock face
-	   this.clockFace = __webpack_require__(8)("./" + this.options.face + "/face.js")(this.ctx, this.options);
+	   this.clockFace = __webpack_require__(2)("./" + this.options.face + "/face.js")(this.ctx, this.options);
 
 	   // Handle time changes
 	   util.on("hourChange", function(newHour) {
@@ -131,6 +131,7 @@
 	   cancelButton     .addEventListener("click", this.hide.bind(this));
 	   this.inputElement.addEventListener("focus", this.show.bind(this));
 	   this.inputElement.addEventListener("blur",  this.handleBlur.bind(this));
+	   canvas           .addEventListener("click", function(evt) {this.interacted = true;}.bind(this));
 
 	   // Store references
 	   this.canvas           = canvas;
@@ -151,6 +152,21 @@
 	   // Insert container into the dom
 	   document.body.appendChild(this.containerElement);
 
+	   var inputMetrics     = this.inputElement.getBoundingClientRect();
+	   var contianerMetrics = this.containerElement.getBoundingClientRect();
+
+	   // Position the container element
+	   if (inputMetrics.right + contianerMetrics.width - 12 < window.innerWidth) {
+	      this.containerElement.style.left = inputMetrics.right + 12 + "px";
+	   } else {
+	      this.containerElement.style.left = window.innerWidth - 24 - contianerMetrics.width + "px";
+	   }
+
+	   var top = (inputMetrics.top + inputMetrics.height / 2) - (contianerMetrics.height / 2);
+	   if (top < 50) top = 50;
+	   this.containerElement.style.top = top + "px";
+
+	   this.interacted = false;
 	   util.trigger("controlOpen");
 	};
 
@@ -167,7 +183,7 @@
 	Pikatime.prototype.handleBlur = function() {
 	   setTimeout(function() {
 	      if (this.interacted === false) {
-	        // this.hide();
+	        this.hide();
 	      }
 	   }.bind(this), 200);
 	};
@@ -176,8 +192,8 @@
 	/* Save the state of the picker to the input element */
 	/*****************************************************/
 	Pikatime.prototype.save = function() {
-	   this.containerElement.parentNode.removeChild(this.containerElement);
-	   this.inputElement.value = util.padString(this.state.hour, 2)      + ":" + util.padString(this.state.minute, 2);
+	   this.inputElement.value = util.padString(this.state.hour, 2) + ":" + util.padString(this.state.minute, 2);
+	   this.hide();
 	};
 
 
@@ -193,7 +209,9 @@
 	            if ($this.data("pikatime")) {
 	               return $this.data("pikatime");
 	            } else {
-	               $this.data("pikatime", new Pikatime(this));
+	               $this.data("pikatime", new Pikatime(this, {
+	                  face: $this.attr("data-mode")
+	               }));
 	               return $this.data("pikatime");
 	            }
 	         });
@@ -348,11 +366,29 @@
 
 
 /***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */,
-/* 6 */
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./12/face.js": 3,
+		"./24/face.js": 4
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 2;
+
+
+/***/ },
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var util = __webpack_require__(1);
@@ -609,7 +645,7 @@
 	};
 
 /***/ },
-/* 7 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var util = __webpack_require__(1);
@@ -625,8 +661,9 @@
 	      selectedRadius: 15, // The radius of the circle when something is selected
 	      face24Radius:   90, // The radius of the 24 hour part of the face
 	      face12Radius:   60, // The radius of the 12 hour part of the face
+	      faceOffsetY:    20,
 	      minuteRadius:   75, // The radius of the minute part of the face
-	      timeY:          20, // The y location of the time display
+	      timeY:          25, // The y location of the time display
 	      font:           "12px Arial", // The font of the numerals around the clock face
 	      timeFont:       "24px Arial", // The font of the time display
 	   }, options);
@@ -634,11 +671,12 @@
 
 	   /************************************************************/
 	   /* Translate util.circleForEach to the center of the canvas */
+	   /* Offset slightly to make it "look" centered               */
 	   /************************************************************/
 	   var center = function(radius, func) {
 	      util.circleForEach(radius, function(x, y, step) {
 	         x += canvas.width  / 2;
-	         y += canvas.height / 2;
+	         y += canvas.height / 2 + options.faceOffsetY;
 	         func(x, y, step);
 	      });
 	   };
@@ -683,14 +721,14 @@
 
 	      // Render the selector arm
 	      ctx.beginPath();
-	      ctx.moveTo(canvas.width / 2, canvas.height / 2);
+	      ctx.moveTo(canvas.width / 2, canvas.height / 2 + options.faceOffsetY);
 	      ctx.lineTo(x, y);
 	      ctx.stroke();
 
 	      // Render the white dot at the center of the clock
 	      ctx.fillStyle = options.color;
 	      ctx.beginPath();
-	      ctx.arc(canvas.width / 2, canvas.height / 2, 1, 0, Math.PI * 2);
+	      ctx.arc(canvas.width / 2, canvas.height / 2 + options.faceOffsetY, 1, 0, Math.PI * 2);
 	      ctx.fill();
 	   };
 
@@ -844,28 +882,6 @@
 	      render: render
 	   };
 	};
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var map = {
-		"./12/face.js": 6,
-		"./24/face.js": 7
-	};
-	function webpackContext(req) {
-		return __webpack_require__(webpackContextResolve(req));
-	};
-	function webpackContextResolve(req) {
-		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
-	};
-	webpackContext.keys = function webpackContextKeys() {
-		return Object.keys(map);
-	};
-	webpackContext.resolve = webpackContextResolve;
-	module.exports = webpackContext;
-	webpackContext.id = 8;
 
 
 /***/ }

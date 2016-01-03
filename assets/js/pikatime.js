@@ -85,6 +85,7 @@ Pikatime.prototype.initDom = function() {
    cancelButton     .addEventListener("click", this.hide.bind(this));
    this.inputElement.addEventListener("focus", this.show.bind(this));
    this.inputElement.addEventListener("blur",  this.handleBlur.bind(this));
+   canvas           .addEventListener("click", function(evt) {this.interacted = true;}.bind(this));
 
    // Store references
    this.canvas           = canvas;
@@ -105,6 +106,21 @@ Pikatime.prototype.show = function() {
    // Insert container into the dom
    document.body.appendChild(this.containerElement);
 
+   var inputMetrics     = this.inputElement.getBoundingClientRect();
+   var contianerMetrics = this.containerElement.getBoundingClientRect();
+
+   // Position the container element
+   if (inputMetrics.right + contianerMetrics.width - 12 < window.innerWidth) {
+      this.containerElement.style.left = inputMetrics.right + 12 + "px";
+   } else {
+      this.containerElement.style.left = window.innerWidth - 24 - contianerMetrics.width + "px";
+   }
+
+   var top = (inputMetrics.top + inputMetrics.height / 2) - (contianerMetrics.height / 2);
+   if (top < 50) top = 50;
+   this.containerElement.style.top = top + "px";
+
+   this.interacted = false;
    util.trigger("controlOpen");
 };
 
@@ -121,7 +137,7 @@ Pikatime.prototype.hide = function() {
 Pikatime.prototype.handleBlur = function() {
    setTimeout(function() {
       if (this.interacted === false) {
-        // this.hide();
+        this.hide();
       }
    }.bind(this), 200);
 };
@@ -130,8 +146,8 @@ Pikatime.prototype.handleBlur = function() {
 /* Save the state of the picker to the input element */
 /*****************************************************/
 Pikatime.prototype.save = function() {
-   this.containerElement.parentNode.removeChild(this.containerElement);
-   this.inputElement.value = util.padString(this.state.hour, 2)      + ":" + util.padString(this.state.minute, 2);
+   this.inputElement.value = util.padString(this.state.hour, 2) + ":" + util.padString(this.state.minute, 2);
+   this.hide();
 };
 
 
@@ -147,7 +163,9 @@ if (typeof jQuery !== "undefined") {
             if ($this.data("pikatime")) {
                return $this.data("pikatime");
             } else {
-               $this.data("pikatime", new Pikatime(this));
+               $this.data("pikatime", new Pikatime(this, {
+                  face: $this.attr("data-mode")
+               }));
                return $this.data("pikatime");
             }
          });

@@ -11,8 +11,9 @@ module.exports = function(ctx, options) {
       selectedRadius: 15, // The radius of the circle when something is selected
       face24Radius:   90, // The radius of the 24 hour part of the face
       face12Radius:   60, // The radius of the 12 hour part of the face
+      faceOffsetY:    20,
       minuteRadius:   75, // The radius of the minute part of the face
-      timeY:          20, // The y location of the time display
+      timeY:          25, // The y location of the time display
       font:           "12px Arial", // The font of the numerals around the clock face
       timeFont:       "24px Arial", // The font of the time display
    }, options);
@@ -20,11 +21,12 @@ module.exports = function(ctx, options) {
 
    /************************************************************/
    /* Translate util.circleForEach to the center of the canvas */
+   /* Offset slightly to make it "look" centered               */
    /************************************************************/
    var center = function(radius, func) {
       util.circleForEach(radius, function(x, y, step) {
          x += canvas.width  / 2;
-         y += canvas.height / 2;
+         y += canvas.height / 2 + options.faceOffsetY;
          func(x, y, step);
       });
    };
@@ -69,14 +71,14 @@ module.exports = function(ctx, options) {
 
       // Render the selector arm
       ctx.beginPath();
-      ctx.moveTo(canvas.width / 2, canvas.height / 2);
+      ctx.moveTo(canvas.width / 2, canvas.height / 2 + options.faceOffsetY);
       ctx.lineTo(x, y);
       ctx.stroke();
 
       // Render the white dot at the center of the clock
       ctx.fillStyle = options.color;
       ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height / 2, 1, 0, Math.PI * 2);
+      ctx.arc(canvas.width / 2, canvas.height / 2 + options.faceOffsetY, 1, 0, Math.PI * 2);
       ctx.fill();
    };
 
