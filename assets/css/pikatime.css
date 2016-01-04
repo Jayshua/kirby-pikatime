@@ -10,11 +10,11 @@
 .pikatime-container::before {
    content: "";
    position: absolute;
-   left: -1em;
+   left: -30px;
    top: 50%;
    transform: translateY(-50%);
 
-   border: solid .5em transparent;
+   border: solid 15px transparent;
    border-right-color: black;
 }
 
