@@ -2,6 +2,9 @@
    width: 250px;
    position: absolute;
    z-index: 1001;
+   box-shadow: 0 5px 15px -5px rgba(0, 0, 0, .5);
+   border-radius: 3px;
+   background-color: black;
 }
 
 .pikatime-container::before {
@@ -17,14 +20,37 @@
 
 .pikatime-container canvas {
    display: block;
+
+   -webkit-border-top-left-radius: 3px;
+   -webkit-border-top-right-radius: 3px;
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+   border-top-left-radius: 3px;
+   border-top-right-radius: 3px;
 }
 
 .pikatime-container button {
    border: none;
-   background-color: black;
    color: white;
-   padding: 1em;
+   padding: .6em .6em .75em;
    width: 50%;
+   background-color: black;
+}
+
+.pikatime-container div {
+   overflow: hidden;
+   border-top: 1px solid #333;
+
+   -webkit-border-bottom-right-radius: 3px;
+   -webkit-border-bottom-left-radius: 3px;
+   -moz-border-radius-bottomright: 3px;
+   -moz-border-radius-bottomleft: 3px;
+   border-bottom-right-radius: 3px;
+   border-bottom-left-radius: 3px;
+}
+
+.pikatime-container div button:first-of-type {
+   border-right: 1px solid #333;
 }
 
 .pikatime-container button:hover {
