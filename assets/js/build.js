@@ -147,6 +147,9 @@
 	   if (time) {
 	      this.state.hour   = parseInt(time[1], 10);
 	      this.state.minute = parseInt(time[3], 10);
+	   } else {
+	      this.state.hour   = 12;
+	      this.state.minute = 0;
 	   }
 
 	   // Insert container into the dom
@@ -411,6 +414,50 @@
 	      pmX: canvas.width / 2 + 75    // The x coordinate of the pm control
 	   }, options);
 
+	   /****************************************/
+	   /* Convert 24 hour time to 12 hour time */
+	   /****************************************/
+	   var convert24to12 = function(time) {
+	      var newTime = {};
+
+	      if (time.hour === 0) {
+	         newTime.hour   = 12;
+	         newTime.period = "am";
+	      } else if (time.hour >= 1 && time.hour <= 11) {
+	         newTime.hour = time.hour;
+	         newTime.period = "am";
+	      } else if (time.hour === 12) {
+	         newTime.hour   = 12;
+	         newTime.period = "pm";      
+	      } else {
+	         newTime.hour = time.hour - 12;
+	         newTime.period = "pm";
+	      }
+
+	      newTime.minute = time.minute;
+	      return newTime;
+	   };
+
+	   /****************************************/
+	   /* Convert 12 hour time to 24 hour time */
+	   /****************************************/
+	   var convert12to24 = function(time) {
+	      var newTime = {};
+
+	      if (time.period === "am" && time.hour === 12) {
+	         newTime.hour = 0;
+	      } else if (time.period === "pm" && time.hour === 12) {
+	         newTime.hour = 12;
+	      } else if (time.period === "am") {
+	         newTime.hour = time.hour;
+	      } else {
+	         newTime.hour = time.hour + 12;
+	      }
+
+	      newTime.minute = time.minute;
+	      return newTime;
+	   };
+
 	   /************************************************************/
 	   /* Translate util.circleForEach to the center of the canvas */
 	   /************************************************************/
@@ -572,15 +619,7 @@
 	   /* Render the clock face */
 	   /*************************/
 	   var render = function(parentState) {
-	      var localState = util.extend(parentState, state);
-
-	      // Convert 24 hour time to 12 hour time
-	      if (localState.hour  > 12) {
-	         localState.hour  -= 12;
-	         localState.period = "pm";
-	      } else {
-	         localState.period = "am";
-	      }
+	      var localState = util.extend(convert24to12(parentState), state);
 
 	      if (localState.interval === "hour") {
 	         renderHourFace(localState);
@@ -600,15 +639,10 @@
 	      center(options.faceRadius, function(numberX, numberY, step) {
 	         if (util.centerIntersects(mouseX, mouseY, numberX, numberY, options.selectedRadius)) {
 	            if (state.interval === "hour") {
-	               var newHour = step;
+	               var currentTime  = convert24to12(util.getTime());
+	               currentTime.hour = step;
 
-	               if (util.getTime().hour > 12)
-	                  newHour += 12;
-
-	               if (newHour === "24")
-	                  newHour = 0;
-
-	               util.trigger("hourChange", newHour);
+	               util.trigger("hourChange", convert12to24(currentTime).hour);
 	               state.interval = "minute";
 	            } else {
 	               var newMinute = step * 5;
@@ -619,14 +653,16 @@
 
 	      // Test for click on the am period toggle
 	      if (util.centerIntersects(mouseX, mouseY, options.amX, options.periodY, options.selectedRadius)) {
-	         var currentTime = util.getTime();
-	         if (currentTime.hour > 12) util.trigger("hourChange", currentTime.hour - 12);
+	         var currentTime = convert24to12(util.getTime());
+	         currentTime.period = "am";
+	         util.trigger("hourChange", convert12to24(currentTime).hour);
 	      }
 
 	      // Test for click on the pm period toggle
 	      if (util.centerIntersects(mouseX, mouseY, options.pmX, options.periodY, options.selectedRadius)) {
-	         var currentTime = util.getTime();
-	         if (currentTime.hour < 13) util.trigger("hourChange", currentTime.hour + 12);
+	         var currentTime = convert24to12(util.getTime());
+	         currentTime.period = "pm";
+	         util.trigger("hourChange", convert12to24(currentTime).hour);
 	      }
 
 	      console.log(state.period);

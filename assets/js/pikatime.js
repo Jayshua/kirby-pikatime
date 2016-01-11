@@ -101,6 +101,9 @@ Pikatime.prototype.show = function() {
    if (time) {
       this.state.hour   = parseInt(time[1], 10);
       this.state.minute = parseInt(time[3], 10);
+   } else {
+      this.state.hour   = 12;
+      this.state.minute = 0;
    }
 
    // Insert container into the dom
