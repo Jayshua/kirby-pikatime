@@ -54,8 +54,6 @@ Pikatime.prototype.render = function() {
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
       this.clockFace.render(this.state);
-   } else {
-      console.log("No render");
    }
 
    window.requestAnimationFrame(this.render.bind(this));
