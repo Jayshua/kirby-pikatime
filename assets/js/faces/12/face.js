@@ -268,8 +268,6 @@ module.exports = function(ctx, options) {
          currentTime.period = "pm";
          util.trigger("hourChange", convert12to24(currentTime).hour);
       }
-
-      console.log(state.period);
    });
 
    /**********************************************************/
