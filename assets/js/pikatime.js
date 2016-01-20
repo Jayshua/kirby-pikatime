@@ -12,8 +12,8 @@ Pikatime = function(inputElement, options) {
    }, options);
 
    this.state = {
-      hour: 12,   // The currently selected hour
-      minute: 0,  // The currently selected minute
+      hour: 12,  // The currently selected hour
+      minute: 0, // The currently selected minute
    };
 
    util.registerGetTimeHandler(function() {
@@ -49,10 +49,14 @@ Pikatime = function(inputElement, options) {
 /* Render the clock control */
 /****************************/
 Pikatime.prototype.render = function() {
-   this.ctx.fillStyle = this.options.background;
-   this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+   if (this.containerElement.style.display === "block") {
+      this.ctx.fillStyle = this.options.background;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-   this.clockFace.render(this.state);
+      this.clockFace.render(this.state);
+   } else {
+      console.log("No render");
+   }
 
    window.requestAnimationFrame(this.render.bind(this));
 };
@@ -90,6 +94,10 @@ Pikatime.prototype.initDom = function() {
    // Store references
    this.canvas           = canvas;
    this.containerElement = container;
+
+   // Insert hidden container into the dom
+   this.containerElement.style.display = "none";
+   document.body.appendChild(this.containerElement);
 };
 
 /********************/
@@ -106,23 +114,26 @@ Pikatime.prototype.show = function() {
       this.state.minute = 0;
    }
 
-   // Insert container into the dom
-   document.body.appendChild(this.containerElement);
+   // Display container
+   this.containerElement.style.display = "block";
 
+   // Get container coordinates for position calculation
    var inputMetrics     = this.inputElement.getBoundingClientRect();
    var contianerMetrics = this.containerElement.getBoundingClientRect();
 
-   // Position the container element
+   // Position the container element horizontally
    if (inputMetrics.right + contianerMetrics.width - 12 < window.innerWidth) {
       this.containerElement.style.left = inputMetrics.right + 12 + "px";
    } else {
       this.containerElement.style.left = window.innerWidth - 24 - contianerMetrics.width + "px";
    }
 
+   // Position the container element vertically
    var top = (inputMetrics.top + inputMetrics.height / 2) - (contianerMetrics.height / 2);
    if (top < 50) top = 50;
    this.containerElement.style.top = top + "px";
 
+   // Set control state and trigger open event
    this.interacted = false;
    util.trigger("controlOpen");
 };
@@ -131,7 +142,7 @@ Pikatime.prototype.show = function() {
 /* Hide the control */
 /********************/
 Pikatime.prototype.hide = function() {
-   this.containerElement.parentNode.removeChild(this.containerElement);
+   this.containerElement.style.display = "none";
 };
 
 /****************************************/
