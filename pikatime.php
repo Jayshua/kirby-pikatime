@@ -13,6 +13,7 @@ class PikatimeField extends InputField {
   public function input() {
     $input = parent::input();
     $input->data("field", "pikatime");
+    $this->icon = "clock-o";
     
     if (isset($this->mode))
       $input->data("mode", $this->mode());
