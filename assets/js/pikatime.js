@@ -1,4 +1,8 @@
 var util = require("./util");
+var Point = require("./point");
+var Time = require("./time");
+
+
 
 /**************************/
 /* Create a time selector */
@@ -12,15 +16,11 @@ Pikatime = function(inputElement, options) {
    }, options);
 
    this.state = {
-      hour: 12,  // The currently selected hour
-      minute: 0, // The currently selected minute
+      time:            Time.from24(15, 0),   // The currently selected time
+      pointerLocation: Point.fromCart(0, 0) // The location of the user's mouse/finger
    };
 
-   util.registerGetTimeHandler(function() {
-      return this.state;
-   }.bind(this));
-
-   // Build the dom of the selector
+   // Build the control's DOM
    this.inputElement = inputElement;
    this.initDom();
 
@@ -31,37 +31,22 @@ Pikatime = function(inputElement, options) {
    canvas.width  = 250;
 
    // Initialize the clock face
-   this.clockFace = require("./faces/" + this.options.face + "/face.js")(this.ctx, this.options);
+   var Face = require("./faces/" + this.options.face + "/face.js");
+   this.clockFace = new Face(this.ctx, this.options);
 
    // Handle time changes
-   util.on("hourChange", function(newHour) {
-      this.state.hour = newHour;
-   }.bind(this));
-
-   util.on("minuteChange", function(newMinute) {
-      this.state.minute = newMinute;
+   util.on("timeChange", function(newTime) {
+      this.state.time = newTime;
    }.bind(this));
 
    this.render();
+   this.show();
 };
 
-/****************************/
-/* Render the clock control */
-/****************************/
-Pikatime.prototype.render = function() {
-   if (this.containerElement.style.display === "block") {
-      this.ctx.fillStyle = this.options.background;
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.clockFace.render(this.state);
-   }
-
-   window.requestAnimationFrame(this.render.bind(this));
-};
-
-/********************************************************************************/
-/* Creates all the dom nodes needed for the time control (including the canvas) */
-/********************************************************************************/
+/*******************************************************************************/
+/* Create all the dom nodes needed for the time control (including the canvas) */
+/*******************************************************************************/
 Pikatime.prototype.initDom = function() {
    var container       = document.createElement("div");
    var canvas          = document.createElement("canvas");
@@ -83,39 +68,61 @@ Pikatime.prototype.initDom = function() {
    cancelButton.innerText = "Cancel";
 
    // Attach event listeners
-   okButton         .addEventListener("click", this.save.bind(this));
-   cancelButton     .addEventListener("click", this.hide.bind(this));
-   this.inputElement.addEventListener("focus", this.show.bind(this));
-   this.inputElement.addEventListener("blur",  this.handleBlur.bind(this));
-   canvas           .addEventListener("click", function(evt) {this.interacted = true;}.bind(this));
+   this.inputElement.addEventListener("focus",      this.show                  .bind(this));
+   this.inputElement.addEventListener("blur",       this.handleBlur            .bind(this));
+   okButton         .addEventListener("click",      this.save                  .bind(this));
+   cancelButton     .addEventListener("click",      this.hide                  .bind(this));
+   canvas           .addEventListener("mousedown",  this.handleInteractionStart.bind(this));
+   canvas           .addEventListener("mousemove",  this.handleInteractionMove .bind(this));
+   document         .addEventListener("mouseup",    this.handleInteractionEnd  .bind(this));
+   canvas           .addEventListener("touchstart", this.handleInteractionStart.bind(this));
+   canvas           .addEventListener("touchmove",  this.handleInteractionMove .bind(this));
+   document         .addEventListener("touchend",   this.handleInteractionEnd  .bind(this));
 
    // Store references
    this.canvas           = canvas;
    this.containerElement = container;
 
-   // Insert hidden container into the dom
+   // Insert the hidden container into the dom
    this.containerElement.style.display = "none";
    document.body.appendChild(this.containerElement);
 };
+
+
+/****************************/
+/* Render the clock control */
+/****************************/
+Pikatime.prototype.render = function() {
+   if (this.containerElement.style.display === "block") {
+      this.ctx.fillStyle = this.options.background;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.ctx.save();
+      this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+      this.clockFace.render(this.state);
+      this.ctx.restore();
+   }
+
+   window.requestAnimationFrame(this.render.bind(this));
+};
+
 
 /********************/
 /* Show the control */
 /********************/
 Pikatime.prototype.show = function() {
    // Update the state with the input field's current values
-   var time = /([0-9]+)(:)([0-9]+)/.exec(this.inputElement.value);   
+   var time = /([0-9]+)(:)([0-9]+)/.exec(this.inputElement.value);
    if (time) {
-      this.state.hour   = parseInt(time[1], 10);
-      this.state.minute = parseInt(time[3], 10);
+      this.state.time = Time.from24(parseInt(time[1], 10), parseInt(time[3], 10));
    } else {
-      this.state.hour   = 12;
-      this.state.minute = 0;
+      this.state.time = Time.from24(0, 0);
    }
 
-   // Display container
+   // Display the container
    this.containerElement.style.display = "block";
 
-   // Get container coordinates for position calculation
+   // Get coordinates for container position calculation
    var inputMetrics     = this.inputElement.getBoundingClientRect();
    var contianerMetrics = this.containerElement.getBoundingClientRect();
 
@@ -131,10 +138,18 @@ Pikatime.prototype.show = function() {
    if (top < 50) top = 50;
    this.containerElement.style.top = top + "px";
 
+   // Save the center of the canvas for interaction location calculations
+   var canvasMetrics = this.canvas.getBoundingClientRect();
+   this.canvasCenter = Point.fromCart(
+      canvasMetrics.left + (this.canvas.width  / 2),
+      canvasMetrics.top  + (this.canvas.height / 2)
+   );
+
    // Set control state and trigger open event
    this.interacted = false;
    util.trigger("controlOpen");
 };
+
 
 /********************/
 /* Hide the control */
@@ -143,9 +158,10 @@ Pikatime.prototype.hide = function() {
    this.containerElement.style.display = "none";
 };
 
-/****************************************/
-/* Handle the blur of the input element */
-/****************************************/
+
+/**********************************************************************/
+/* Determine whether to hide the control on blur of the input element */
+/**********************************************************************/
 Pikatime.prototype.handleBlur = function() {
    setTimeout(function() {
       if (this.interacted === false) {
@@ -154,11 +170,44 @@ Pikatime.prototype.handleBlur = function() {
    }.bind(this), 200);
 };
 
+
+/*************************************************************************************/
+/* Handle the start of a user's interaction with the control (mousedown, touchstart) */
+/*************************************************************************************/
+Pikatime.prototype.handleInteractionStart = function(event) {
+   event.preventDefault();
+   var interactionLocation = Point.subtract(Point.fromEvent(event), this.canvasCenter);
+   util.trigger("interactionStart", interactionLocation, this.state.time);
+};
+
+
+/*************************************************************************/
+/* Handle a movement interaction with the control (mousemove, touchmove) */
+/*************************************************************************/
+Pikatime.prototype.handleInteractionMove = function(event) {
+   event.preventDefault();
+   this.state.pointerLocation = Point.subtract(Point.fromEvent(event), this.canvasCenter);
+   util.trigger("interactionMove", this.state.pointerLocation, this.state.time);
+};
+
+
+/*********************************************************************************/
+/* Handle the end of the user's interaction with the control (mouseup, touchend) */
+/*********************************************************************************/
+Pikatime.prototype.handleInteractionEnd = function(event) {
+   if (event.target === this.inputElement) {
+      return;
+   } else {
+      util.trigger("interactionEnd", this.state.pointerLocation, this.state.time);
+   }
+};
+
+
 /*****************************************************/
 /* Save the state of the picker to the input element */
 /*****************************************************/
 Pikatime.prototype.save = function() {
-   this.inputElement.value = util.padString(this.state.hour, 2) + ":" + util.padString(this.state.minute, 2);
+   this.inputElement.value = util.padLeft(this.state.time.hour, 2) + ":" + util.padLeft(this.state.time.minute, 2);
    this.hide();
 };
 
@@ -167,20 +216,17 @@ Pikatime.prototype.save = function() {
 /* If jQuery exists, add pickatime as a plugin */
 /***********************************************/
 if (typeof jQuery !== "undefined") {
-   (function($) {
-      $.fn.pikatime = function() {
-         return this.each(function() {
-            $this = $(this);
+   jQuery.fn.pikatime = function() {
+      return this.each(function() {
+         $element = jQuery(this);
 
-            if ($this.data("pikatime")) {
-               return $this.data("pikatime");
-            } else {
-               $this.data("pikatime", new Pikatime(this, {
-                  face: $this.attr("data-mode")
-               }));
-               return $this.data("pikatime");
-            }
-         });
-      }
-   }(jQuery));
+         if (!$element.data("pikatime")) {
+            $element.data("pikatime", new Pikatime(this, {
+               face: $element.attr("data-mode")
+            }));
+         }
+
+         return $element.data("pikatime");
+      });
+   }
 }
