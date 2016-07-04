@@ -7,18 +7,18 @@ var Time  = require("../../time.js");
 /********************************************************/
 /* Render the clock face, selector, and digital display */
 /********************************************************/
-var render = function(parentState) {
-   this.renderTimeDisplay(parentState.time, parentState.pointerLocation);
+var render = function(time, pointer) {
+   this.renderTimeDisplay(time, pointer);
 
    if (this.state.animating) {
-      this.renderAnimation(parentState.time, parentState.pointerLocation);
+      this.renderAnimation(time, pointer);
    } else {
-      this.renderClockSelector(parentState.time, parentState.pointerLocation, this.state.interval);
+      this.renderClockSelector(time, pointer, this.state.interval);
 
       if (this.state.interval === "hour") {
-         this.renderHourFace(parentState.time, parentState.pointerLocation);
+         this.renderHourFace(time, pointer);
       } else {
-         this.renderMinuteFace(parentState.time, parentState.pointerLocation);
+         this.renderMinuteFace(time, pointer);
       }
    }
 };
@@ -28,9 +28,11 @@ var render = function(parentState) {
 /* Render both the minute and hour faces while performing the animation between the two */
 /****************************************************************************************/
 var renderAnimation = function(time, pointerLocation) {
+   // Update the animation and compute the current, eased, animation point
    this.state.animationState += 0.05;
    var animationPoint = util.cubicEase(this.state.animationState);
    var scalingFactor = (0.3 * animationPoint);
+
 
    ///////////////////////////////
    // Render the previous face
@@ -39,7 +41,7 @@ var renderAnimation = function(time, pointerLocation) {
    this.ctx.scale(1 + scalingFactor, 1 + scalingFactor);
    // Fade the face out
    this.ctx.globalAlpha = (1 - animationPoint > 0) ? 1 - animationPoint : 0;
-   // Render the selector
+   // Render the time selector arm
    this.renderClockSelector(time, pointerLocation, this.state.interval);
    // Render the face itself
    if (this.state.interval === "hour") {
@@ -58,7 +60,7 @@ var renderAnimation = function(time, pointerLocation) {
    this.ctx.scale(0.7 + scalingFactor, 0.7 + scalingFactor);
    // Fade the face in as the animation progresses
    this.ctx.globalAlpha = animationPoint;
-   // Render the selector
+   // Render the time selector arm
    this.renderClockSelector(time, pointerLocation, (this.state.interval === "hour") ? "minute" : "hour");
    // Render the face itself
    if (this.state.interval === "hour") {
@@ -72,9 +74,9 @@ var renderAnimation = function(time, pointerLocation) {
 
    // Turn off the animation and set the final interval when animation is complete
    if (this.state.animationState >= 1) {
-      this.state.animating = false;
+      this.state.animating      = false;
       this.state.animationState = 0;
-      this.state.interval = (this.state.interval === "hour") ? "minute" : "hour";
+      this.state.interval       = (this.state.interval === "hour") ? "minute" : "hour";
    }
 };
 

@@ -1,6 +1,18 @@
+/*******************************************************************/
+/* Point.js
+/* --------
+/* Implement some basic point computations for working with both
+/* Cartesian and Polar coordinate systems.
+/*
+/* The Point object is meant to be treated as an immutable value.
+/* If you need to change a coordinate, create a new point using
+/* one of the from methods.
+/*******************************************************************/
 var math = require("./math");
+
 var Point = {};
 module.exports = Point;
+
 
 
 /**********************/
@@ -48,19 +60,9 @@ Point.fromEvent = function(event) {
 
 
 
-
-
-/******************************/
-/* Point Conversion Functions */
-/******************************/
-// Get the distance between two points
-Point.distance2 = function(pointA, pointB) {
-   var legA = pointA.x - pointB.x;
-   var legB = pointA.y - pointB.y;
-   return legA * legA + legB * legB;
-};
-
-
+/*****************/
+/* Point Methods */
+/*****************/
 // Get a new point as the difference of two others
 Point.subtract = function(pointA, pointB) {
    return Point.fromCart(pointA.x - pointB.x, pointA.y - pointB.y);
@@ -70,10 +72,4 @@ Point.subtract = function(pointA, pointB) {
 // Get a new point as the sum of two others
 Point.add = function(pointA, pointB) {
    return Point.fromCart(pointA.x + pointB.x, pointA.y + pointB.y);
-};
-
-
-// Get a new point as the rotation of another
-Point.rotate = function(point, angle) {
-   return Point.fromPolar(point.theta + angle, point.radius);
 };

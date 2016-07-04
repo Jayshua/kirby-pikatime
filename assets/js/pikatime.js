@@ -99,7 +99,7 @@ Pikatime.prototype.render = function() {
 
       this.ctx.save();
       this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-      this.clockFace.render(this.state);
+      this.clockFace.render(this.state.time, this.state.pointerLocation);
       this.ctx.restore();
    }
 

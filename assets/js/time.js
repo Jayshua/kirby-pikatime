@@ -1,3 +1,13 @@
+/****************************************************************/
+/* Time.js
+/* -------
+/* Implement basic time computations for working with both
+/* 12 hour and 24 hour time formats.
+/*
+/* The time object is meant to be treated as an immutable value.
+/* If you need to change one of the times, create a new
+/* time object with one of the from methods.
+/****************************************************************/
 var Time = {};
 module.exports = Time;
 
@@ -16,6 +26,7 @@ Time.from12 = function(hour, minute, period) {
 	};
 };
 
+
 // Create a time object from 24 hour time
 Time.from24 = function(hour, minute) {
 	return {
@@ -25,8 +36,6 @@ Time.from24 = function(hour, minute) {
 		period: (hour < 12) ? "am" : "pm"
 	};
 };
-
-
 
 
 /*******************/
@@ -39,13 +48,13 @@ Time.getHourAngle = function(time) {
 	return angle;
 };
 
+
 // Get the clock face angle of the minute part of a time object
 Time.getMinuteAngle = function(time) {
 	var angle = (time.minute / 60) * Math.PI * 2;
 	if (angle > Math.PI) angle -= Math.PI * 2;
 	return angle;
 };
-
 
 
 /****************/

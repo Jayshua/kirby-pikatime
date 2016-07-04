@@ -1,5 +1,6 @@
 var Point = require("./point");
-var math = require("./math");
+var math  = require("./math");
+
 var util = {};
 module.exports = util;
 
@@ -73,7 +74,6 @@ util.circleIterate = function(radius, steps, func) {
       func(Point.fromCart(x, y), step);
    }
 };
-
 
 
 /***********************************/
