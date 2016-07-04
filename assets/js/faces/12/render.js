@@ -1,3 +1,8 @@
+/*********************************************************************/
+/* Face12 Rendering Module
+/* -----------------------
+/* Handles the rendering and animation management of the clock face
+/*********************************************************************/
 var util  = require("../../util");
 var Point = require("../../point");
 var Time  = require("../../time");
@@ -32,7 +37,7 @@ var renderAnimation = function(time, pointer) {
    // Update the animation and compute the current, eased, animation point
    this.state.animation += 0.04;
    var animationPoint = util.cubicEase(this.state.animation);
-   var scalingFactor = (0.3 * animationPoint);
+   var scalingFactor  = (0.3 * animationPoint);
 
 
    //////////////////////////////

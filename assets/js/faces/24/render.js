@@ -1,3 +1,8 @@
+/*********************************************************************/
+/* Face24 Rendering Module
+/* -----------------------
+/* Handles the rendering and animation management of the clock face
+/*********************************************************************/
 var util  = require("../../util.js");
 var Point = require("../../point.js");
 var Time  = require("../../time.js");
@@ -101,7 +106,7 @@ var renderClockSelector = function(time, pointer, interval) {
 
       if (interval === "hour") {
          // Constrain the selector to one of the two face's radius
-         var midRadius = (this.options.face12Radius + this.options.face24Radius) / 2;
+         var midRadius  = (this.options.face12Radius + this.options.face24Radius) / 2;
          var markRadius = (pointer.radius > midRadius) ? this.options.face24Radius : this.options.face12Radius;
 
          markLocation = Point.fromPolar(pointer.theta, markRadius);
@@ -259,11 +264,11 @@ var calculateTimeMetrics = function(time) {
 
 
 module.exports = {
-   render              : render,
-   renderAnimation     : renderAnimation,
-   renderTimeDisplay   : renderTimeDisplay,
-   renderMinuteFace    : renderMinuteFace,
-   renderHourFace      : renderHourFace,
-   renderClockSelector : renderClockSelector,
-   calculateTimeMetrics: calculateTimeMetrics,
+   render               : render,
+   renderAnimation      : renderAnimation,
+   renderTimeDisplay    : renderTimeDisplay,
+   renderMinuteFace     : renderMinuteFace,
+   renderHourFace       : renderHourFace,
+   renderClockSelector  : renderClockSelector,
+   calculateTimeMetrics : calculateTimeMetrics,
 };

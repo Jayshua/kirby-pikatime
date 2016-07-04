@@ -1,6 +1,18 @@
+/********************************************************************************/
+/* Face12
+/* ------
+/* Implements the 12 hour face control.
+/*
+/* The 12 hour face is divided into three modules:
+/* 1. face.js        - The basic state, options, event initialization
+/* 2. interaction.js - User interaction management including click/touch handlers
+/* 3. render.js      - The code that renders the face onto the canvas
+/*
+/* The modules are added to the Face12 prototype by an extend call at
+/* the bottom of this file.
+/********************************************************************************/
 var util  = require("../../util");
 var Point = require("../../point");
-var Time  = require("../../time");
 
 
 

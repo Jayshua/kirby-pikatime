@@ -1,3 +1,15 @@
+/**********************************************************************/
+/* Pikatime
+/* --------
+/* Implements the top level control functionality including:
+/* - Dom creation and management
+/* - Showing/hiding the control.
+/* - The top level rendering function with requestAnimationFrame.
+/* - The top level user interaction listeners, which are then delegated
+/*   to the clock faces with an event bus from the utilities module.
+/* - Loading and saving the time to and from the input element
+/* 
+/**********************************************************************/
 var util = require("./util");
 var Point = require("./point");
 var Time = require("./time");
@@ -9,15 +21,15 @@ var Time = require("./time");
 /**************************/
 Pikatime = function(inputElement, options) {
    this.options = util.extend({
-      color:      "white",   // The color of the text
-      background: "black",   // The background color of the canvas
-      highlight:  "#8dae28", // The color of the highlight when something is selected
-      face:       "12"       // The clock face to show
+      color      : "white",   // The color of the text
+      background : "black",   // The background color of the canvas
+      highlight  : "#8dae28", // The color of the highlight when something is selected
+      face       : "12"       // The clock face to show
    }, options);
 
    this.state = {
-      time:            Time.from24(15, 0),   // The currently selected time
-      pointerLocation: Point.fromCart(0, 0) // The location of the user's mouse/finger
+      time            : Time.from24(15, 0),  // The currently selected time
+      pointerLocation : Point.fromCart(0, 0) // The location of the user's mouse/finger
    };
 
    // Build the control's DOM
@@ -159,6 +171,16 @@ Pikatime.prototype.hide = function() {
 };
 
 
+/*****************************************************/
+/* Save the state of the picker to the input element */
+/*****************************************************/
+Pikatime.prototype.save = function() {
+   this.inputElement.value = util.padLeft(this.state.time.hour, 2) + ":" + util.padLeft(this.state.time.minute, 2);
+
+   this.hide();
+};
+
+
 /**********************************************************************/
 /* Determine whether to hide the control on blur of the input element */
 /**********************************************************************/
@@ -187,7 +209,6 @@ Pikatime.prototype.handleInteractionStart = function(event) {
 Pikatime.prototype.handleInteractionMove = function(event) {
    event.preventDefault();
    this.state.pointerLocation = Point.subtract(Point.fromEvent(event), this.canvasCenter);
-   util.trigger("interactionMove", this.state.pointerLocation, this.state.time);
 };
 
 
@@ -195,21 +216,11 @@ Pikatime.prototype.handleInteractionMove = function(event) {
 /* Handle the end of the user's interaction with the control (mouseup, touchend) */
 /*********************************************************************************/
 Pikatime.prototype.handleInteractionEnd = function(event) {
-   if (event.target === this.inputElement) {
-      return;
-   } else {
+   if (event.target !== this.inputElement) {
       util.trigger("interactionEnd", this.state.pointerLocation, this.state.time);
    }
 };
 
-
-/*****************************************************/
-/* Save the state of the picker to the input element */
-/*****************************************************/
-Pikatime.prototype.save = function() {
-   this.inputElement.value = util.padLeft(this.state.time.hour, 2) + ":" + util.padLeft(this.state.time.minute, 2);
-   this.hide();
-};
 
 
 /***********************************************/

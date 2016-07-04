@@ -1,3 +1,9 @@
+/******************************************************************/
+/* Face12 Interaction
+/* ------------------
+/* Handles the user click/tap/dragging interactions on clock face.
+/*
+/******************************************************************/
 var util  = require("../../util");
 var Point = require("../../point");
 var Time  = require("../../time");

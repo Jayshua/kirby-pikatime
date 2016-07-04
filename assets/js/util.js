@@ -1,3 +1,36 @@
+/*******************************************************/
+/* Utilities
+/* ---------
+/* Provides a number of miscellaneous helper functions
+/* used throughout the codebase.
+/*
+/* - extend(object1, object2, ..., objectN)
+/*   Return a new object consisting of all the properties of the arguments
+/*
+/* - intersects(pointToTest, pointToTestAgainst, areaRadius)
+/*   Basic collision test against the two points provided.
+/*
+/* - cubicEase(normalized)
+/*   Take a value between 0 and 1 and return the cubically eased version
+/*
+/* - padLeft(string, width, placeholder = 0)
+/*   Pad a string to the provided width with `placeholder` character
+/*
+/* - circleIterate(radius, steps, callback)
+/*   Call `callback` at each `steps` number of points around the outer
+/*   edge of a circle of the provided radius.
+/*
+/*   The callback is passed the parameters:
+/*   Point - The location of the step around the outer edge of the circle
+/*   step  - The current iteration
+/*
+/* - on(event, callback)
+/*   Add a listener to the global event bus on the provided `event`
+/*
+/* - trigger(event, ...arguments)
+/*   Trigger an event on the global event bus, passing all ...arguments
+/*   to any registered callbacks.
+/*******************************************************/
 var Point = require("./point");
 var math  = require("./math");
 
@@ -10,7 +43,7 @@ module.exports = util;
 /* Return a new object with the properties from the objects provided as arguments */
 /**********************************************************************************/
 util.extend = function() {
-   let newObject = {};
+   var newObject = {};
 
    // Iterate over each object, assigning its keys to the result object
    for (var i = 0; i < arguments.length; i++) {

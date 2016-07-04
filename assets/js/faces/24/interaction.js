@@ -1,3 +1,9 @@
+/******************************************************************/
+/* Face24 Interaction
+/* ------------------
+/* Handles the user click/tap/dragging interactions on clock face.
+/*
+/******************************************************************/
 var util  = require("../../util");
 var Time  = require("../../time");
 var Point = require("../../point");
@@ -11,7 +17,7 @@ var handleInteractStart = function(interactionPoint, time) {
    // Calculate the location of the selector
    var selectorLocation;
    if (this.state.interval === "hour") {
-      var angle = Time.getHourAngle(time);
+      var angle  = Time.getHourAngle(time);
       var radius = (time.hour < 12) ? this.options.face12Radius : this.options.face24Radius;
       selectorLocation = Point.fromPolar(angle, radius);
       selectorLocation = Point.add(selectorLocation, this.options.faceLocation);
@@ -54,9 +60,14 @@ var handleDragEnd = function(pointer, time) {
 
    if (this.state.interval === "hour") {
       var hour = Time.hourFromAngle(pointer.theta);
+
+      // Compute which of the hour faces was clicked on and adjust the hour if necessary
       var faceMidRadius = (this.options.face12Radius + this.options.face24Radius) / 2;
-      if (pointer.radius > faceMidRadius) hour += 12;
+      if (pointer.radius > faceMidRadius)
+         hour += 12;
+
       newTime = Time.from24(hour, time.minute);
+
       this.changeInterval("minute");
    } else {
       var minute = Time.minuteFromAngle(pointer.theta);
@@ -78,7 +89,7 @@ var handleSelectEnd = function(pointer, time) {
       var midRadius     = (this.options.face12Radius + this.options.face24Radius) / 2;
       var upper24Radius =  this.options.face24Radius + this.options.selectorRadius;
 
-      // Determine which face, if any, the click occurred on
+      // Determine which of the hour faces, if any, the click occurred on
       if (pointer.radius > lower12Radius && pointer.radius < midRadius) {
          var newHour = Time.hourFromAngle(pointer.theta);
          util.trigger("timeChange", Time.from24(newHour, time.minute));
@@ -104,7 +115,7 @@ var handleSelectEnd = function(pointer, time) {
    var timeMetrics = this.calculateTimeMetrics(time);
 
    // Time metrics are calculated from the left side of the digits, we need them from the middle
-   var hourLocation = Point.add(timeMetrics.hour, Point.fromCart(timeMetrics.hourWidth / 2, 0));
+   var hourLocation   = Point.add(timeMetrics.hour, Point.fromCart(timeMetrics.hourWidth / 2, 0));
    var minuteLocation = Point.add(timeMetrics.minute, Point.fromCart(timeMetrics.minuteWidth / 2, 0));
 
    // Test for interaction on the hour segment

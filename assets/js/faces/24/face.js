@@ -1,6 +1,18 @@
+/********************************************************************************/
+/* Face24
+/* ------
+/* Implements the 24 hour face control.
+/*
+/* The 24 hour face is divided into three modules:
+/* 1. face.js        - The basic state, options, event initialization
+/* 2. interaction.js - User interaction management including click/touch handlers
+/* 3. render.js      - The code that renders the face onto the canvas
+/*
+/* The modules are added to the Face24 prototype by an extend call at
+/* the bottom of this file.
+/********************************************************************************/
 var util  = require("../../util");
 var Point = require("../../point");
-var Time  = require("../../time");
 
 
 
@@ -42,6 +54,10 @@ Face24.prototype.handleControlOpen = function() {
 };
 
 
+/*******************************************************************************************/
+/* Change the interval by setting the animating state.                                     */
+/* The actual interval changing is done in the render method when the animation completes. */
+/*******************************************************************************************/
 Face24.prototype.changeInterval = function(newInterval) {
    if (this.state.interval !== newInterval) {
       this.state.animating = true;
@@ -49,6 +65,9 @@ Face24.prototype.changeInterval = function(newInterval) {
 };
 
 
+/*********************************************************/
+/* Add the rest of the Face24 modules onto the prototype */
+/*********************************************************/
 Face24.prototype = util.extend(Face24.prototype, require("./interaction"), require("./render"));
 
 
