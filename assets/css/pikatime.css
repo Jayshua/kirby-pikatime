@@ -10,21 +10,21 @@
 .pikatime-container::before {
    content: "";
    position: absolute;
-   left: -30px;
-   top: 50%;
-   transform: translateY(-50%);
+   top: -30px;
+   left: 50%;
+   transform: translateX(-50%);
 
    border: solid 15px transparent;
-   border-right-color: black;
+   border-bottom-color: black;
+}
+
+.pikatime-container-no-arrow::before {
+   display: none;
 }
 
 .pikatime-container canvas {
    display: block;
 
-   -webkit-border-top-left-radius: 3px;
-   -webkit-border-top-right-radius: 3px;
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
    border-top-left-radius: 3px;
    border-top-right-radius: 3px;
 }
@@ -41,10 +41,6 @@
    overflow: hidden;
    border-top: 1px solid #333;
 
-   -webkit-border-bottom-right-radius: 3px;
-   -webkit-border-bottom-left-radius: 3px;
-   -moz-border-radius-bottomright: 3px;
-   -moz-border-radius-bottomleft: 3px;
    border-bottom-right-radius: 3px;
    border-bottom-left-radius: 3px;
 }
