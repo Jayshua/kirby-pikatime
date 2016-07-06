@@ -10,11 +10,11 @@ License: [MIT](http://opensource.org/licenses/MIT)
 <div>
 	<img
 		src="https://raw.githubusercontent.com/Jayshua/kirby-pikatime/draggingInteraction/example12.png"
-		style="max-width: 50%; display: inline-block;" />
+		style="max-width: 50%; float: left;" />
 
 	<img
 		src="https://raw.githubusercontent.com/Jayshua/kirby-pikatime/draggingInteraction/example24.png"
-		style="max-width: 50%; display: inline-block;" />
+		style="max-width: 50%; float: left;" />
 </div>
 
 ## Installation
