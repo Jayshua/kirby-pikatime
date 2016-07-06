@@ -6,15 +6,15 @@ License: [MIT](http://opensource.org/licenses/MIT)
 
 ![Example](https://raw.githubusercontent.com/Jayshua/kirby-pikatime/draggingInteraction/example.gif)
 
-## Comes in 12 hour mode | ## And 24 hour mode
+## Comes in 12 hour and 24 hour mode
 <div>
 	<img
 		src="https://raw.githubusercontent.com/Jayshua/kirby-pikatime/draggingInteraction/example12.png"
-		style="float: left; width: 50%;" />
+		style="max-width: 50%; display: inline-block;" />
 
 	<img
 		src="https://raw.githubusercontent.com/Jayshua/kirby-pikatime/draggingInteraction/example24.png"
-		style="float: left; width: 50%;" />
+		style="max-width: 50%; display: inline-block;" />
 </div>
 
 ## Installation
