@@ -4,7 +4,11 @@ This panel field for [Kirby](http://getkirby.com) is a better time picker than t
 
 License: [MIT](http://opensource.org/licenses/MIT)
 
-![Screenshot](https://raw.githubusercontent.com/Jayshua/kirby-pikatime/master/example.png)
+![Example](https://raw.githubusercontent.com/Jayshua/kirby-pikatime/master/example.gif)
+
+## Comes in 12 hour and 24 hour modes
+![Example](https://raw.githubusercontent.com/Jayshua/kirby-pikatime/master/example12.png)
+![Example](https://raw.githubusercontent.com/Jayshua/kirby-pikatime/master/example24.png)
 
 ## Installation
 
