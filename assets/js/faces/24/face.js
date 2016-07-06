@@ -4,7 +4,7 @@
 /* Implements the 24 hour face control.
 /*
 /* The 24 hour face is divided into three modules:
-/* 1. face.js        - The basic state, options, event initialization
+/* 1. face.js        - Initialization of state, options, and events. Plus methods
 /* 2. interaction.js - User interaction management including click/touch handlers
 /* 3. render.js      - The code that renders the face onto the canvas
 /*

@@ -33,19 +33,21 @@ var render = function(time, pointer) {
 /* Render both the minute and hour faces while performing the animation between the two */
 /****************************************************************************************/
 var renderAnimation = function(time, pointerLocation) {
-   // Update the animation and compute the current, eased, animation point
+   var ctx = this.ctx;
+
+   // Update the animation and compute the current eased animation point
    this.state.animationState += 0.05;
    var animationPoint = util.cubicEase(this.state.animationState);
-   var scalingFactor = (0.3 * animationPoint);
+   var scalingFactor = (0.3 * animationPoint); // The current state of the scaling animation
 
 
    ///////////////////////////////
    // Render the previous face
-   this.ctx.save();
-   // Scale the face up
-   this.ctx.scale(1 + scalingFactor, 1 + scalingFactor);
-   // Fade the face out
-   this.ctx.globalAlpha = (1 - animationPoint > 0) ? 1 - animationPoint : 0;
+   ctx.save();
+   // Scale the face up, expanding as the animation progresses
+   ctx.scale(1 + scalingFactor, 1 + scalingFactor);
+   // Fade the face out as the animation progresses
+   ctx.globalAlpha = (1 - animationPoint > 0) ? 1 - animationPoint : 0;
    // Render the time selector arm
    this.renderClockSelector(time, pointerLocation, this.state.interval);
    // Render the face itself
@@ -55,16 +57,16 @@ var renderAnimation = function(time, pointerLocation) {
       this.renderMinuteFace(time, pointerLocation);
    }
    // Restore scale and alpha to previous values
-   this.ctx.restore();
+   ctx.restore();
 
 
    ///////////////////////////////
    // Render the incoming face
-   this.ctx.save();
+   ctx.save();
    // Scale the face down, expanding as the animation progresses
-   this.ctx.scale(0.7 + scalingFactor, 0.7 + scalingFactor);
+   ctx.scale(0.7 + scalingFactor, 0.7 + scalingFactor);
    // Fade the face in as the animation progresses
-   this.ctx.globalAlpha = animationPoint;
+   ctx.globalAlpha = animationPoint;
    // Render the time selector arm
    this.renderClockSelector(time, pointerLocation, (this.state.interval === "hour") ? "minute" : "hour");
    // Render the face itself
@@ -74,7 +76,7 @@ var renderAnimation = function(time, pointerLocation) {
       this.renderHourFace(time, pointerLocation);
    }
    // Restore the scale and alpha to the previous values
-   this.ctx.restore();
+   ctx.restore();
 
 
    // Turn off the animation and set the final interval when animation is complete
@@ -101,7 +103,9 @@ var renderClockSelector = function(time, pointer, interval) {
    // Calculate the current location of the selector
    var markLocation;
    if (this.state.dragging) {
-      // Adjust the pointer for the clock face offset
+      // The clock face is offset from the center, so the basic calculations will not
+      // show the pointer as interacting with any part of it.
+      // Move the pointer location to where the clock face actually renders
       pointer = Point.subtract(pointer, this.options.faceLocation);
 
       if (interval === "hour") {
